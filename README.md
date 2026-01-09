@@ -1,1 +1,1 @@
-This is just for me to test of Mind AR.
+This is just for me to test Mind AR.

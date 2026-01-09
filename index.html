@@ -78,7 +78,7 @@
                     src="#rocketModel"
                     scale="0.5 0.5 0.5"
                     position="0 0 0.1"
-                    rotation="90 0 0"
+                    rotation="0 0 0"
                     animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
       </a-gltf-model>
 
@@ -91,31 +91,32 @@
 
   <!-- Interactivity Script -->
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const rocket = document.querySelector("#rocket");
-      const btn = document.querySelector("#launchBtn");
+  window.addEventListener("DOMContentLoaded", () => {
+    const rocket = document.querySelector("#rocket");
+    const btn = document.querySelector("#launchBtn");
 
-      function launchRocket() {
-        // Play animation
-        rocket.setAttribute("animation-mixer", {
-          clip: "rocket_launch",
-          loop: "once",
-          timeScale: 1
-        });
+    function launchRocket() {
+      // Play animation
+      rocket.setAttribute("animation-mixer", {
+        clip: "rocket_launch",
+        loop: "once", 
+        timeScale: 1
+      });
+    }
 
-        // Reset to resting pose after 2.5s (adjust to match animation length)
-        setTimeout(() => {
-          rocket.setAttribute("animation-mixer", {
-            clip: "rocket_launch",
-            loop: "once",
-            timeScale: 0
-          });
-        }, 2500);
-      }
-
-      if (rocket) rocket.addEventListener("click", launchRocket);
-      if (btn) btn.addEventListener("click", launchRocket);
+    // Listen for animation end
+    rocket.addEventListener('animation-finished', () => {
+      // Reset rocket to resting pose
+      rocket.setAttribute('animation-mixer', { clip: 'rocket_launch', loop: 'once', timeScale: 0 });
+      rocket.object3D.position.set(0, 0, 0.1);
+      rocket.object3D.scale.set(0.3, 0.3, 0.3);
+      rocket.object3D.rotation.set(0, 0, 0);
     });
-  </script>
+
+    // Launch via button or tap
+    btn.addEventListener("click", launchRocket);
+    rocket.addEventListener("click", launchRocket);
+  });
+</script>
 </body>
 </html>

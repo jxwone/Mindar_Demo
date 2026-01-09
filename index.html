@@ -1,15 +1,87 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <title>MindAR Rocket Launch</title>
+
+    <!-- A-Frame + MindAR -->
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   </head>
-  <body>
-    <a-scene mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
-      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-      <a-entity mindar-image-target="targetIndex: 0">
-        <a-plane color="blue" opaciy="0.5" position="0 0 0" height="0.552" width="1" rotation="0 0 0"></a-plane>
+
+  <body style="margin:0;overflow:hidden;">
+    <!-- Simple UI overlay -->
+    <div style="position:absolute;top:20px;left:20px;z-index:10;">
+      <button id="launchBtn"
+              style="padding:10px 16px;font-size:16px;border:none;border-radius:6px;
+                     background:#ff6a00;color:white;cursor:pointer;">
+        Launch Rocket
+      </button>
+    </div>
+
+    <!-- AR Scene -->
+    <a-scene embedded
+             mindar-image="imageTargetSrc: ./myimage.mind;"
+             color-space="sRGB"
+             renderer="colorManagement: true, physicallyCorrectLights"
+             vr-mode-ui="enabled: false"
+             device-orientation-permission-ui="enabled: false"
+             loading-screen="enabled: false"
+             inspector="false"
+             keyboard-shortcuts="enterVR: false; esc: false">
+
+      <a-assets>
+        <!-- Replace with jsDelivr path if using GitHub Pages -->
+        <a-asset-item id="rocketModel" src="./Rocket_Demo.glb"></a-asset-item>
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+
+      <a-entity mindar-image-target="targetIndex:0">
+
+        <!-- Rocket Model -->
+        <a-gltf-model id="rocket"
+                      src="#rocketModel"
+                      scale="0.3 0.3 0.3"
+                      position="0 0 0.1"
+                      rotation="0 0 0"
+                      animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
+        </a-gltf-model>
+
+        <!-- Optional Lighting -->
+        <a-light type="directional" intensity="1" position="1 1 1"></a-light>
+        <a-light type="ambient" intensity="0.6"></a-light>
+
       </a-entity>
     </a-scene>
+
+    <!-- Interactivity Script -->
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const rocket = document.querySelector("#rocket");
+        const btn = document.querySelector("#launchBtn");
+
+        function launchRocket() {
+          // Play animation
+          rocket.setAttribute("animation-mixer", {
+            clip: "rocket_launch",
+            loop: "once",
+            timeScale: 1
+          });
+
+          // Reset to resting pose after ~2.5s
+          setTimeout(() => {
+            rocket.setAttribute("animation-mixer", {
+              clip: "rocket_launch",
+              loop: "once",
+              timeScale: 0
+            });
+          }, 2500);
+        }
+
+        if (rocket) rocket.addEventListener("click", launchRocket);
+        if (btn) btn.addEventListener("click", launchRocket);
+      });
+    </script>
   </body>
 </html>

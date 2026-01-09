@@ -1,87 +1,119 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MindAR Rocket Launch</title>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MindAR Rocket Launch</title>
 
-    <!-- A-Frame + MindAR -->
-    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-  </head>
+  <!-- A-Frame 1.5 -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <!-- MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-  <body style="margin:0;overflow:hidden;">
-    <!-- Simple UI overlay -->
-    <div style="position:absolute;top:20px;left:20px;z-index:10;">
-      <button id="launchBtn"
-              style="padding:10px 16px;font-size:16px;border:none;border-radius:6px;
-                     background:#ff6a00;color:white;cursor:pointer;">
-        Launch Rocket
-      </button>
-    </div>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    a-scene {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .mindar-video {
+      object-fit: cover !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    /* Simple UI button overlay */
+    #launchBtn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      padding: 10px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      background: #ff6a00;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
 
-    <!-- AR Scene -->
-    <a-scene embedded
-             mindar-image="imageTargetSrc: ./myimage.mind;"
-             color-space="sRGB"
-             renderer="colorManagement: true, physicallyCorrectLights"
-             vr-mode-ui="enabled: false"
-             device-orientation-permission-ui="enabled: false"
-             loading-screen="enabled: false"
-             inspector="false"
-             keyboard-shortcuts="enterVR: false; esc: false">
+<body>
+  <!-- Launch Button -->
+  <button id="launchBtn">Launch Rocket</button>
 
-      <a-assets>
-        <!-- Replace with jsDelivr path if using GitHub Pages -->
-        <a-asset-item id="rocketModel" src="https://github.com/jxwone/Mindar_Demo/blob/main/Rocket_Demo.glb"></a-asset-item>
-      </a-assets>
+  <!-- AR Scene -->
+  <a-scene embedded
+           mindar-image="imageTargetSrc: ./myimage.mind;"
+           color-space="sRGB"
+           renderer="colorManagement: true, physicallyCorrectLights"
+           vr-mode-ui="enabled: false"
+           device-orientation-permission-ui="enabled: false"
+           loading-screen="enabled: false"
+           inspector="false"
+           keyboard-shortcuts="enterVR: false; esc: false">
 
-      <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+    <a-assets>
+      <!-- Use proper raw GitHub link via jsDelivr for reliable loading -->
+      <a-asset-item id="rocketModel"
+                    src="https://cdn.jsdelivr.net/gh/jxwone/Mindar_Demo/Rocket_Demo.glb"></a-asset-item>
+    </a-assets>
 
-      <a-entity mindar-image-target="targetIndex:0">
+    <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
-        <!-- Rocket Model -->
-        <a-gltf-model id="rocket"
-                      src="#rocketModel"
-                      scale="0.3 0.3 0.3"
-                      position="0 0 0.1"
-                      rotation="0 0 0"
-                      animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
-        </a-gltf-model>
+    <a-entity mindar-image-target="targetIndex:0">
 
-        <!-- Optional Lighting -->
-        <a-light type="directional" intensity="1" position="1 1 1"></a-light>
-        <a-light type="ambient" intensity="0.6"></a-light>
+      <!-- Rocket model: default pose at timeScale 0 -->
+      <a-gltf-model id="rocket"
+                    src="#rocketModel"
+                    scale="0.3 0.3 0.3"
+                    position="0 0 0.1"
+                    rotation="0 0 0"
+                    animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
+      </a-gltf-model>
 
-      </a-entity>
-    </a-scene>
+      <!-- Basic lighting -->
+      <a-light type="directional" intensity="1" position="1 1 1"></a-light>
+      <a-light type="ambient" intensity="0.6"></a-light>
 
-    <!-- Interactivity Script -->
-    <script>
-      window.addEventListener("DOMContentLoaded", () => {
-        const rocket = document.querySelector("#rocket");
-        const btn = document.querySelector("#launchBtn");
+    </a-entity>
+  </a-scene>
 
-        function launchRocket() {
-          // Play animation
+  <!-- Interactivity Script -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const rocket = document.querySelector("#rocket");
+      const btn = document.querySelector("#launchBtn");
+
+      function launchRocket() {
+        // Play animation
+        rocket.setAttribute("animation-mixer", {
+          clip: "rocket_launch",
+          loop: "once",
+          timeScale: 1
+        });
+
+        // Reset to resting pose after 2.5s (adjust to match animation length)
+        setTimeout(() => {
           rocket.setAttribute("animation-mixer", {
             clip: "rocket_launch",
             loop: "once",
-            timeScale: 1
+            timeScale: 0
           });
+        }, 2500);
+      }
 
-          // Reset to resting pose after ~2.5s
-          setTimeout(() => {
-            rocket.setAttribute("animation-mixer", {
-              clip: "rocket_launch",
-              loop: "once",
-              timeScale: 0
-            });
-          }, 2500);
-        }
-
-        if (rocket) rocket.addEventListener("click", launchRocket);
-        if (btn) btn.addEventListener("click", launchRocket);
-      });
-    </script>
-  </body>
+      if (rocket) rocket.addEventListener("click", launchRocket);
+      if (btn) btn.addEventListener("click", launchRocket);
+    });
+  </script>
+</body>
 </html>

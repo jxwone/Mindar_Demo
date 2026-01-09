@@ -1,10 +1,14 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   </head>
   <body>
+    <div style="position:absolute;top:20px;left:20px;z-index:10;">
+      <button id="launchBtn">Launch Rocket</button>
+    </div>
+
     <a-scene mindar-image="imageTargetSrc: ./myimage.mind;" 
              color-space="sRGB" 
              renderer="colorManagement: true, physicallyCorrectLights" 
@@ -12,19 +16,19 @@
              device-orientation-permission-ui="enabled: false">
 
       <a-assets>
-        <!-- Your rocket model -->
         <a-asset-item id="rocketModel" src="./Rocket_Demo.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
-        <a-gltf-model 
+        <a-gltf-model
+            id="rocket" 
             rotation="0 0 0" 
             position="0 0 0.1" 
             scale="1 1 1" 
             src="#rocketModel"
-            animation="property: position; to: 0 0.2 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate">
+            animation-mixer="clip: none; loop: once; timeScale: 1;">
         </a-gltf-model>
 
         <!-- Optional lighting -->
@@ -32,5 +36,17 @@
         <a-light type="ambient" intensity="0.6"></a-light>
       </a-entity>
     </a-scene>
+
+    <script>
+      const rocket = document.querySelector('#rocket');
+      rocket.addEventListener('click', () => {
+        rocket.setAttribute('animation-mixer', { clip: 'rocket_launch', loop: 'once', timeScale: 1 });
+      });
+
+      const btn = document.querySelector('#launchBtn');
+      btn.addEventListener('click', () => {
+        rocket.setAttribute('animation-mixer', { clip: 'rocket_launch', loop: 'once', timeScale: 1 });
+      });
+    </script>
   </body>
 </html>

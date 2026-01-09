@@ -89,31 +89,41 @@
     </a-entity>
   </a-scene>
 
-  <!-- Interactivity Script -->
-  <script>
+<!-- Interactivity Script -->
+<script>
   window.addEventListener("DOMContentLoaded", () => {
     const rocket = document.querySelector("#rocket");
     const btn = document.querySelector("#launchBtn");
 
+    function resetRocket() {
+      // Stop any current animation completely
+      const mixer = rocket.components['animation-mixer']?.mixer;
+      if (mixer) mixer.stopAllAction();
+
+      // Reset transforms to default pose
+      rocket.object3D.position.set(0, 0, 0.1);
+      rocket.object3D.scale.set(0.3, 0.3, 0.3);
+      rocket.object3D.rotation.set(0, 0, 0);
+    }
+
     function launchRocket() {
-      // Play animation
-      rocket.setAttribute("animation-mixer", {
-        clip: "rocket_launch",
-        loop: "once", 
+      // Reset rocket before starting animation
+      resetRocket();
+
+      // Play the animation
+      rocket.setAttribute('animation-mixer', {
+        clip: 'rocket_launch',
+        loop: 'once',
         timeScale: 1
       });
     }
 
-    // Listen for animation end
+    // Listen for animation finished event to auto-reset
     rocket.addEventListener('animation-finished', () => {
-      // Reset rocket to resting pose
-      rocket.setAttribute('animation-mixer', { clip: 'rocket_launch', loop: 'once', timeScale: 0 });
-      rocket.object3D.position.set(0, 0, 0.1);
-      rocket.object3D.scale.set(0.3, 0.3, 0.3);
-      rocket.object3D.rotation.set(0, 0, 0);
+      resetRocket();
     });
 
-    // Launch via button or tap
+    // Launch on button click or rocket tap
     btn.addEventListener("click", launchRocket);
     rocket.addEventListener("click", launchRocket);
   });

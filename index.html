@@ -4,7 +4,7 @@
     <title>MindAR Rocket Launch</title>
 
     <!-- A-Frame + MindAR -->
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   </head>
 
@@ -22,50 +22,59 @@
     <a-scene embedded
              mindar-image="imageTargetSrc: ./myimage.mind;"
              color-space="sRGB"
-             renderer="colorManagement:true,physicallyCorrectLights"
-             vr-mode-ui="enabled:false"
+             renderer="colorManagement: true, physicallyCorrectLights"
+             vr-mode-ui="enabled: false"
+             device-orientation-permission-ui="enabled: false"
              loading-screen="enabled: false"
              inspector="false"
-             keyboard-shortcuts="enterVR: false; esc: false"
-             device-orientation-permission-ui="enabled:false">
+             keyboard-shortcuts="enterVR: false; esc: false">
 
       <a-assets>
-        <a-asset-item id="rocketModel" src="https://github.com/jxwone/Mindar_Demo/blob/main/Rocket_Demo.glb"></a-asset-item>
+        <!-- Replace with jsDelivr path if using GitHub Pages -->
+        <a-asset-item id="rocketModel" src="./Rocket_Demo.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex:0">
+
+        <!-- Rocket Model -->
         <a-gltf-model id="rocket"
                       src="#rocketModel"
                       scale="0.3 0.3 0.3"
                       position="0 0 0.1"
                       rotation="0 0 0"
-                      animation-mixer="clip:none;loop:once;timeScale:1;">
+                      animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
         </a-gltf-model>
 
+        <!-- Optional Lighting -->
         <a-light type="directional" intensity="1" position="1 1 1"></a-light>
         <a-light type="ambient" intensity="0.6"></a-light>
+
       </a-entity>
     </a-scene>
 
-    <!-- Interactivity -->
+    <!-- Interactivity Script -->
     <script>
       window.addEventListener("DOMContentLoaded", () => {
         const rocket = document.querySelector("#rocket");
         const btn = document.querySelector("#launchBtn");
 
-        // Launch function
         function launchRocket() {
+          // Play animation
           rocket.setAttribute("animation-mixer", {
             clip: "rocket_launch",
             loop: "once",
-            timeScale: 1,
+            timeScale: 1
           });
 
-          // reset after the animation finishes (~2s)
+          // Reset to resting pose after ~2.5s
           setTimeout(() => {
-            rocket.setAttribute("animation-mixer", { clip: "none" });
+            rocket.setAttribute("animation-mixer", {
+              clip: "rocket_launch",
+              loop: "once",
+              timeScale: 0
+            });
           }, 2500);
         }
 

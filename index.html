@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -6,7 +7,7 @@
     <!-- A-Frame 1.5 -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-    <!-- A-Frame Extras (for animation-mixer support) -->
+    <!-- A-Frame Extras for animation-mixer -->
     <script src="https://unpkg.com/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
     <!-- MindAR -->
@@ -14,7 +15,7 @@
 
     <style>
       html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
-      a-scene { width:100%; height:100%; position:absolute; top:0; left:0; }
+      a-scene  { width:100%; height:100%; position:absolute; top:0; left:0; }
       .mindar-video { object-fit:cover!important; width:100%!important; height:100%!important; }
     </style>
   </head>
@@ -40,11 +41,12 @@
 
       <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
-      <a-entity mindar-image-target="targetIndex:0">
+      <!-- MindAR target -->
+      <a-entity id="markerTarget" mindar-image-target="targetIndex:0">
 
         <!-- Instruction text -->
         <a-text id="tapPrompt"
-                value="Tap the object!"
+                value="Tap the screen!"
                 color="#ffffff"
                 stroke="#000000"
                 stroke-width="2"
@@ -58,41 +60,34 @@
                       src="#rocketModel"
                       scale="0.3 0.3 0.3"
                       position="0 0 0.1"
-                      rotation="90 0 0"
-                      animation-mixer="clip:rocket_launch; loop:once; timeScale:0;">
+                      rotation="0 0 0"
+                      animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
         </a-gltf-model>
 
-        <!-- Basic lighting -->
+        <!-- Lighting -->
         <a-light type="directional" intensity="1" position="1 1 1"></a-light>
         <a-light type="ambient" intensity="0.6"></a-light>
       </a-entity>
     </a-scene>
 
+    <!-- Tap anywhere to play -->
     <script>
-    window.addEventListener("DOMContentLoaded", () => {
-    const markerTarget = document.querySelector("#markerTarget");
-    const rocket = document.querySelector("#rocket");
-    const prompt = document.querySelector("#tapPrompt");
+      window.addEventListener("DOMContentLoaded", () => {
+        const rocket = document.querySelector("#rocket");
+        const prompt = document.querySelector("#tapPrompt");
 
-    // make sure animation is paused initially
-    rocket.setAttribute("animation-mixer", {
-      clip: "rocket_launch",
-      loop: "once",
-      timeScale: 0
-    });
+        // Make sure rocket is paused at start
+        rocket.setAttribute("animation-mixer", { clip: "rocket_launch", loop: "once", timeScale: 0 });
 
-    // play animation when the target is tapped
-    markerTarget.addEventListener("click", () => {
-      prompt.setAttribute("visible", false);
+        // Tap anywhere while marker is visible
+        window.addEventListener("touchstart", () => {
+          // Hide prompt
+          prompt.setAttribute("visible", false);
 
-      // play the animation by setting timeScale back to 1
-      rocket.setAttribute("animation-mixer", {
-        clip: "rocket_launch",
-        loop: "once",
-        timeScale: 1
+          // Play animation
+          rocket.setAttribute("animation-mixer", { clip: "rocket_launch", loop: "once", timeScale: 1 });
+        });
       });
-    });
-  });
     </script>
   </body>
 </html>

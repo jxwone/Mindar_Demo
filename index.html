@@ -1,189 +1,88 @@
-<!DOCTYPE html>
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MindAR Tap-to-Launch Rocket</title>
+    <title>MindAR Tap Rocket</title>
 
     <!-- A-Frame 1.5 -->
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-    <!-- A-Frame Extras (improves animation-mixer, supports rigged GLBs better) -->
+    <!-- A-Frame Extras (for animation-mixer support) -->
     <script src="https://unpkg.com/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
-    <!-- MindAR for image tracking -->
+    <!-- MindAR -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <!-- Styling -->
     <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
-      a-scene {
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-      }
-      .mindar-video {
-        object-fit: cover !important;
-        width: 100% !important;
-        height: 100% !important;
-      }
+      html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+      a-scene { width:100%; height:100%; position:absolute; top:0; left:0; }
+      .mindar-video { object-fit:cover!important; width:100%!important; height:100%!important; }
     </style>
   </head>
 
   <body>
-    <!-- AR Scene -->
     <a-scene
       embedded
       mindar-image="imageTargetSrc: ./myimage.mind;"
       color-space="sRGB"
       renderer="colorManagement: true, physicallyCorrectLights"
-      vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: false"
-      loading-screen="enabled: false"
+      vr-mode-ui="enabled:false"
+      device-orientation-permission-ui="enabled:false"
+      loading-screen="enabled:false"
       inspector="false"
-      keyboard-shortcuts="enterVR: false; esc: false"
+      keyboard-shortcuts="enterVR:false; esc:false"
     >
       <a-assets>
-        <!-- Rocket GLB model hosted on your GitHub via jsDelivr -->
         <a-asset-item
           id="rocketModel"
-          src="https://cdn.jsdelivr.net/gh/jxwone/Mindar_Demo/Rocket_Demo.glb"
-        ></a-asset-item>
+          src="https://cdn.jsdelivr.net/gh/jxwone/Mindar_Demo/Rocket_Demo.glb">
+        </a-asset-item>
       </a-assets>
 
-      <!-- Camera -->
       <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
-      <!-- Target area for MindAR tracking -->
-      <a-entity id="rocket-container" mindar-image-target="targetIndex:0">
-        <!-- Prompt text above the rocket -->
-        <a-text
-          id="tapPrompt"
-          value="Tap the object!"
-          color="#ffffff"
-          position="0 0.7 0.1"
-          align="center"
-          width="2"
-          shader="msdf"
-          stroke="#000000"
-          stroke-width="2"
-        ></a-text>
+      <a-entity mindar-image-target="targetIndex:0">
+
+        <!-- Instruction text -->
+        <a-text id="tapPrompt"
+                value="Tap the object!"
+                color="#ffffff"
+                stroke="#000000"
+                stroke-width="2"
+                position="0 0.7 0.1"
+                align="center"
+                width="2">
+        </a-text>
+
+        <!-- Rocket model -->
+        <a-gltf-model id="rocket"
+                      src="#rocketModel"
+                      scale="0.3 0.3 0.3"
+                      position="0 0 0.1"
+                      rotation="0 0 0"
+                      animation-mixer="clip:none; loop:once; timeScale:1;">
+        </a-gltf-model>
+
+        <!-- Basic lighting -->
+        <a-light type="directional" intensity="1" position="1 1 1"></a-light>
+        <a-light type="ambient" intensity="0.6"></a-light>
       </a-entity>
     </a-scene>
 
-<<<<<<< HEAD
-    <!-- Interactivity Script -->
-     <script>
-=======
-      <!-- Rocket model: default pose at timeScale 0 -->
-      <a-gltf-model id="rocket"
-                    src="#rocketModel"
-                    scale="0.5 0.5 0.5"
-                    position="0 0 0.1"
-                    rotation="0 0 0"
-                    animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
-      </a-gltf-model>
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const rocket = document.querySelector("#rocket");
+        const prompt = document.querySelector("#tapPrompt");
 
-      <!-- Basic lighting -->
-      <a-light type="directional" intensity="1" position="1 1 1"></a-light>
-      <a-light type="ambient" intensity="0.6"></a-light>
-
-    </a-entity>
-  </a-scene>
-
-  <!-- Interactivity Script -->
-  <script>
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of ff53780 (Update index.html)
-=======
->>>>>>> parent of ff53780 (Update index.html)
-=======
->>>>>>> parent of ff53780 (Update index.html)
-  window.addEventListener("DOMContentLoaded", () => {
-    const container = document.querySelector("#rocket-container");
-    const prompt = document.querySelector("#tapPrompt");
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    // spawn new rocket each time
-    function addRocket() {
-      const rocket = document.createElement("a-gltf-model");
-      rocket.setAttribute("src", "#rocketModel");
-      rocket.setAttribute("position", "0 0 0.1");
-      rocket.setAttribute("scale", "0.3 0.3 0.3");
-      rocket.setAttribute("rotation", "0 0 0");
-      container.appendChild(rocket);
-
-      // --- interactivity ---
-      rocket.addEventListener("click", () => {
-        prompt.setAttribute("visible", false);
-
-        // remove existing mixer first (clean start)
-        if (rocket.hasAttribute("animation-mixer")) {
-          rocket.removeAttribute("animation-mixer");
-        }
-
-        // start animation fresh
-        rocket.setAttribute("animation-mixer", {
-          clip: "rocket_launch",   // exact name from GLB
-          loop: "once",
-          timeScale: 1
+        // tap to play animation once
+        rocket.addEventListener("click", () => {
+          prompt.setAttribute("visible", false); // hide text
+          rocket.setAttribute("animation-mixer", {
+            clip: "rocket_launch",   // confirm this matches your clip name
+            loop: "once",
+            timeScale: 1
+          });
         });
-
-        // when animation finishes, rebuild after short delay
-        rocket.addEventListener(
-          "animation-finished",
-          () => {
-            // wait a single frame to ensure mixer cleanup
-            requestAnimationFrame(() => {
-              container.removeChild(rocket);
-              prompt.setAttribute("visible", true);
-              addRocket(); // fresh model
-            });
-          },
-          { once: true }
-        );
       });
-    }
-
-    addRocket(); // initial load
-=======
-=======
->>>>>>> parent of ff53780 (Update index.html)
-=======
->>>>>>> parent of ff53780 (Update index.html)
-    function launchRocket() {
-      // Play animation
-      rocket.setAttribute("animation-mixer", {
-        clip: "rocket_launch",
-        loop: "once", 
-        timeScale: 1
-      });
-    }
-
-    // Listen for animation end
-    rocket.addEventListener('animation-finished', () => {
-      // Reset rocket to resting pose
-      rocket.setAttribute('animation-mixer', { clip: 'rocket_launch', loop: 'once', timeScale: 0 });
-      rocket.object3D.position.set(0, 0, 0.1);
-      rocket.object3D.scale.set(0.3, 0.3, 0.3);
-      rocket.object3D.rotation.set(0, 0, 0);
-    });
-
-    // Launch via button or tap
-    btn.addEventListener("click", launchRocket);
-    rocket.addEventListener("click", launchRocket);
->>>>>>> parent of ff53780 (Update index.html)
-  });
-</script>
+    </script>
   </body>
 </html>

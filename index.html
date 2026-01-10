@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MindAR Tap Rocket</title>
+  <title>MindAR Tap Rocket with Reset</title>
 
   <!-- A-Frame 1.5 -->
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
@@ -28,12 +28,25 @@
       background: rgba(0,0,0,0); /* invisible */
       cursor: pointer;
     }
+
+    /* Reset button styling */
+    #resetBtn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 20;
+      padding: 10px 15px;
+      font-size: 16px;
+    }
   </style>
 </head>
 
 <body>
   <!-- Invisible tap zone -->
   <div id="tapZone"></div>
+
+  <!-- Reset button -->
+  <button id="resetBtn">Reset</button>
 
   <a-scene
     embedded
@@ -84,26 +97,41 @@
     </a-entity>
   </a-scene>
 
-  <!-- Script for tap interaction -->
+  <!-- Script for tap and reset -->
   <script>
     window.addEventListener("DOMContentLoaded", () => {
       const rocket = document.querySelector("#rocket");
       const prompt = document.querySelector("#tapPrompt");
       const tapZone = document.querySelector("#tapZone");
+      const resetBtn = document.querySelector("#resetBtn");
 
-      // Ensure rocket starts paused
+      // Ensure rocket starts paused at resting pose
       rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
 
-      // Play animation when invisible button is tapped
+      // Tap the rocket (invisible button)
       tapZone.addEventListener("click", () => {
-        prompt.setAttribute("visible", false);
-        rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:1 });
+        // Disable tapZone after first tap
+        tapZone.style.pointerEvents = "none";
+        tapZone.style.display = "none";
 
-        // Optional: reset after animation duration (e.g., 2.5s)
-        setTimeout(() => {
-          rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
-          prompt.setAttribute("visible", true);
-        }, 2500); // adjust to your animation length
+        // Hide instruction text
+        prompt.setAttribute("visible", false);
+
+        // Play rocket animation
+        rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:1 });
+      });
+
+      // Reset button logic
+      resetBtn.addEventListener("click", () => {
+        // Reset rocket to resting pose
+        rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
+
+        // Show instruction text
+        prompt.setAttribute("visible", true);
+
+        // Re-enable tapZone
+        tapZone.style.pointerEvents = "auto";
+        tapZone.style.display = "block";
       });
     });
   </script>

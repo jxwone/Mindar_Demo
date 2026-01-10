@@ -78,12 +78,34 @@
       </a-entity>
     </a-scene>
 
+<<<<<<< HEAD
     <!-- Interactivity Script -->
      <script>
+=======
+      <!-- Rocket model: default pose at timeScale 0 -->
+      <a-gltf-model id="rocket"
+                    src="#rocketModel"
+                    scale="0.5 0.5 0.5"
+                    position="0 0 0.1"
+                    rotation="0 0 0"
+                    animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
+      </a-gltf-model>
+
+      <!-- Basic lighting -->
+      <a-light type="directional" intensity="1" position="1 1 1"></a-light>
+      <a-light type="ambient" intensity="0.6"></a-light>
+
+    </a-entity>
+  </a-scene>
+
+  <!-- Interactivity Script -->
+  <script>
+>>>>>>> parent of ff53780 (Update index.html)
   window.addEventListener("DOMContentLoaded", () => {
     const container = document.querySelector("#rocket-container");
     const prompt = document.querySelector("#tapPrompt");
 
+<<<<<<< HEAD
     // spawn new rocket each time
     function addRocket() {
       const rocket = document.createElement("a-gltf-model");
@@ -126,6 +148,29 @@
     }
 
     addRocket(); // initial load
+=======
+    function launchRocket() {
+      // Play animation
+      rocket.setAttribute("animation-mixer", {
+        clip: "rocket_launch",
+        loop: "once", 
+        timeScale: 1
+      });
+    }
+
+    // Listen for animation end
+    rocket.addEventListener('animation-finished', () => {
+      // Reset rocket to resting pose
+      rocket.setAttribute('animation-mixer', { clip: 'rocket_launch', loop: 'once', timeScale: 0 });
+      rocket.object3D.position.set(0, 0, 0.1);
+      rocket.object3D.scale.set(0.3, 0.3, 0.3);
+      rocket.object3D.rotation.set(0, 0, 0);
+    });
+
+    // Launch via button or tap
+    btn.addEventListener("click", launchRocket);
+    rocket.addEventListener("click", launchRocket);
+>>>>>>> parent of ff53780 (Update index.html)
   });
 </script>
   </body>

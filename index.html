@@ -31,27 +31,10 @@
       width: 100% !important;
       height: 100% !important;
     }
-    /* Simple UI button overlay */
-    #launchBtn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 10;
-      padding: 10px 16px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      background: #ff6a00;
-      color: white;
-      cursor: pointer;
-    }
   </style>
 </head>
 
 <body>
-  <!-- Launch Button -->
-  <button id="launchBtn">Launch Rocket</button>
-
   <!-- AR Scene -->
   <a-scene embedded
            mindar-image="imageTargetSrc: ./myimage.mind;"
@@ -70,63 +53,65 @@
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+    
+      <!-- Target area for MindAR tracking -->
+      <a-entity id="rocket-container" mindar-image-target="targetIndex:0">
+        <!-- Prompt text above the rocket -->
+        <a-text
+          id="tapPrompt"
+          value="Tap the object!"
+          color="#ffffff"
+          position="0 0.7 0.1"
+          align="center"
+          width="2"
+          shader="msdf"
+          stroke="#000000"
+          stroke-width="2"
+        ></a-text>
+      </a-entity>
+    </a-scene>
 
-    <a-entity mindar-image-target="targetIndex:0">
+ <!-- Interactivity Script -->
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const container = document.querySelector("#rocket-container");
+        const prompt = document.querySelector("#tapPrompt");
 
-      <!-- Rocket model: default pose at timeScale 0 -->
-      <a-gltf-model id="rocket"
-                    src="#rocketModel"
-                    scale="0.5 0.5 0.5"
-                    position="0 0 0.1"
-                    rotation="0 0 0"
-                    animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
-      </a-gltf-model>
+        function addRocket() {
+          // Create a new rocket entity
+          const rocket = document.createElement("a-gltf-model");
+          rocket.setAttribute("src", "#rocketModel");
+          rocket.setAttribute("position", "0 0 0.1");
+          rocket.setAttribute("scale", "0.3 0.3 0.3");
+          rocket.setAttribute("rotation", "0 0 0");
+          rocket.setAttribute("animation-mixer", "clip:none; loop:once; timeScale:1;");
 
-      <!-- Basic lighting -->
-      <a-light type="directional" intensity="1" position="1 1 1"></a-light>
-      <a-light type="ambient" intensity="0.6"></a-light>
+          // Add click listener to play animation
+          rocket.addEventListener("click", () => {
+            prompt.setAttribute("visible", false); // Hide "Tap the object!"
+            rocket.setAttribute("animation-mixer", {
+              clip: "rocket_launch",
+              loop: "once",
+              timeScale: 1,
+            });
 
-    </a-entity>
-  </a-scene>
+            // When animation finishes, reload a fresh rocket
+            rocket.addEventListener(
+              "animation-finished",
+              () => {
+                container.removeChild(rocket); // Remove old one
+                prompt.setAttribute("visible", true); // Show text again
+                addRocket(); // Add fresh rocket for replay
+              },
+              { once: true }
+            );
+          });
 
-<!-- Interactivity Script -->
-<script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const rocket = document.querySelector("#rocket");
-    const btn = document.querySelector("#launchBtn");
+          container.appendChild(rocket);
+        }
 
-    function resetRocket() {
-      // Stop any current animation completely
-      const mixer = rocket.components['animation-mixer']?.mixer;
-      if (mixer) mixer.stopAllAction();
-
-      // Reset transforms to default pose
-      rocket.object3D.position.set(0, 0, 0.1);
-      rocket.object3D.scale.set(0.3, 0.3, 0.3);
-      rocket.object3D.rotation.set(0, 0, 0);
-    }
-
-    function launchRocket() {
-      // Reset rocket before starting animation
-      resetRocket();
-
-      // Play the animation
-      rocket.setAttribute('animation-mixer', {
-        clip: 'rocket_launch',
-        loop: 'once',
-        timeScale: 1
+        addRocket(); // Add rocket on load
       });
-    }
-
-    // Listen for animation finished event to auto-reset
-    rocket.addEventListener('animation-finished', () => {
-      resetRocket();
-    });
-
-    // Launch on button click or rocket tap
-    btn.addEventListener("click", launchRocket);
-    rocket.addEventListener("click", launchRocket);
-  });
-</script>
-</body>
+    </script>
+  </body>
 </html>

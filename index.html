@@ -45,7 +45,7 @@
   <!-- Invisible tap zone -->
   <div id="tapZone"></div>
 
-  <!-- Reset button -->
+  <!-- Reset button (always visible) -->
   <button id="resetBtn">Reset</button>
 
   <a-scene
@@ -112,7 +112,6 @@
       tapZone.addEventListener("click", () => {
         // Disable tapZone after first tap
         tapZone.style.pointerEvents = "none";
-        tapZone.style.display = "none";
 
         // Hide instruction text
         prompt.setAttribute("visible", false);
@@ -121,7 +120,7 @@
         rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:1 });
       });
 
-      // Reset button logic
+      // Reset button logic (always visible, like previous launch button)
       resetBtn.addEventListener("click", () => {
         // Reset rocket to resting pose
         rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
@@ -131,7 +130,6 @@
 
         // Re-enable tapZone
         tapZone.style.pointerEvents = "auto";
-        tapZone.style.display = "block";
       });
     });
   </script>

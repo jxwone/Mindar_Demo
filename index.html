@@ -99,39 +99,46 @@
 
   <!-- Script for tap and reset -->
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const rocket = document.querySelector("#rocket");
-      const prompt = document.querySelector("#tapPrompt");
-      const tapZone = document.querySelector("#tapZone");
-      const resetBtn = document.querySelector("#resetBtn");
+  window.addEventListener("DOMContentLoaded", () => {
+  const rocket = document.querySelector("#rocket");
+  const prompt = document.querySelector("#tapPrompt");
+  const tapZone = document.querySelector("#tapZone");
+  const resetBtn = document.querySelector("#resetBtn");
 
-      // Ensure rocket starts paused at resting pose
-      rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
+  // Start rocket paused
+  rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
 
-      // Tap the rocket (invisible button)
-      tapZone.addEventListener("click", () => {
-        // Disable tapZone after first tap
-        tapZone.style.pointerEvents = "none";
+  // Tap the rocket (invisible button)
+  tapZone.addEventListener("click", () => {
+    // Disable tapZone
+    tapZone.style.pointerEvents = "none";
 
-        // Hide instruction text
-        prompt.setAttribute("visible", false);
+    // Play animation
+    rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:1 });
 
-        // Play rocket animation
-        rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:1 });
-      });
+    // Hide text immediately
+    prompt.setAttribute("visible", false);
 
-      // Reset button logic (always visible, like previous launch button)
-      resetBtn.addEventListener("click", () => {
-        // Reset rocket to resting pose
-        rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
+    // After animation finishes (adjust duration as needed)
+    setTimeout(() => {
+      // Hide rocket model completely
+      rocket.setAttribute("visible", false);
+    }, 2500); // replace 2500 with your animation length in ms
+  });
 
-        // Show instruction text
-        prompt.setAttribute("visible", true);
+  // Reset button
+  resetBtn.addEventListener("click", () => {
+    // Make rocket visible and reset animation
+    rocket.setAttribute("visible", true);
+    rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
 
-        // Re-enable tapZone
-        tapZone.style.pointerEvents = "auto";
-      });
-    });
+    // Show instruction text
+    prompt.setAttribute("visible", true);
+
+    // Re-enable tap zone
+    tapZone.style.pointerEvents = "auto";
+  });
+});
   </script>
 </body>
 </html>

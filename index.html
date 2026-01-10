@@ -70,14 +70,15 @@
 
     <script>
       window.addEventListener("DOMContentLoaded", () => {
+        const markerTarget = document.querySelector("#markerTarget");
         const rocket = document.querySelector("#rocket");
         const prompt = document.querySelector("#tapPrompt");
 
-        // tap to play animation once
-        rocket.addEventListener("click", () => {
-          prompt.setAttribute("visible", false); // hide text
+        // attach tap listener to MindAR target (works better on mobile)
+        markerTarget.addEventListener("click", () => {
+          prompt.setAttribute("visible", false);
           rocket.setAttribute("animation-mixer", {
-            clip: "rocket_launch",   // confirm this matches your clip name
+            clip: "rocket_launch",   // make sure this matches the GLB clip name
             loop: "once",
             timeScale: 1
           });

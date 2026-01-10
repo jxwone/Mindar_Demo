@@ -1,93 +1,111 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MindAR Tap Rocket</title>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MindAR Tap Rocket</title>
 
-    <!-- A-Frame 1.5 -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <!-- A-Frame 1.5 -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
 
-    <!-- A-Frame Extras for animation-mixer -->
-    <script src="https://unpkg.com/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+  <!-- A-Frame Extras for animation-mixer -->
+  <script src="https://unpkg.com/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
-    <!-- MindAR -->
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <!-- MindAR -->
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-    <style>
-      html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
-      a-scene  { width:100%; height:100%; position:absolute; top:0; left:0; }
-      .mindar-video { object-fit:cover!important; width:100%!important; height:100%!important; }
-    </style>
-  </head>
+  <style>
+    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
+    a-scene { width:100%; height:100%; position:absolute; top:0; left:0; }
+    .mindar-video { object-fit:cover!important; width:100%!important; height:100%!important; }
 
-  <body>
-    <a-scene
-      embedded
-      mindar-image="imageTargetSrc: ./myimage.mind;"
-      color-space="sRGB"
-      renderer="colorManagement: true, physicallyCorrectLights"
-      vr-mode-ui="enabled:false"
-      device-orientation-permission-ui="enabled:false"
-      loading-screen="enabled:false"
-      inspector="false"
-      keyboard-shortcuts="enterVR:false; esc:false"
-    >
-      <a-assets>
-        <a-asset-item
-          id="rocketModel"
-          src="https://cdn.jsdelivr.net/gh/jxwone/Mindar_Demo/Rocket_Demo.glb">
-        </a-asset-item>
-      </a-assets>
+    /* Invisible tap zone in the center */
+    #tapZone {
+      position: fixed;
+      top: 50%; left: 50%;
+      width: 200px; height: 200px;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      background: rgba(0,0,0,0); /* invisible */
+      cursor: pointer;
+    }
+  </style>
+</head>
 
-      <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
+<body>
+  <!-- Invisible tap zone -->
+  <div id="tapZone"></div>
 
-      <!-- MindAR target -->
-      <a-entity id="markerTarget" mindar-image-target="targetIndex:0">
+  <a-scene
+    embedded
+    mindar-image="imageTargetSrc: ./myimage.mind;"
+    color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights"
+    vr-mode-ui="enabled:false"
+    device-orientation-permission-ui="enabled:false"
+    loading-screen="enabled:false"
+    inspector="false"
+    keyboard-shortcuts="enterVR:false; esc:false"
+  >
+    <a-assets>
+      <a-asset-item
+        id="rocketModel"
+        src="https://cdn.jsdelivr.net/gh/jxwone/Mindar_Demo/Rocket_Demo.glb">
+      </a-asset-item>
+    </a-assets>
 
-        <!-- Instruction text -->
-        <a-text id="tapPrompt"
-                value="Tap the screen!"
-                color="#ffffff"
-                stroke="#000000"
-                stroke-width="2"
-                position="0 0.7 0.1"
-                align="center"
-                width="2">
-        </a-text>
+    <a-camera position="0 0 0" look-controls="enabled:false"></a-camera>
 
-        <!-- Rocket model -->
-        <a-gltf-model id="rocket"
-                      src="#rocketModel"
-                      scale="0.3 0.3 0.3"
-                      position="0 0 0.1"
-                      rotation="0 0 0"
-                      animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
-        </a-gltf-model>
+    <!-- MindAR target -->
+    <a-entity id="markerTarget" mindar-image-target="targetIndex:0">
 
-        <!-- Lighting -->
-        <a-light type="directional" intensity="1" position="1 1 1"></a-light>
-        <a-light type="ambient" intensity="0.6"></a-light>
-      </a-entity>
-    </a-scene>
+      <!-- Instruction text -->
+      <a-text id="tapPrompt"
+              value="Tap the rocket!"
+              color="#ffffff"
+              stroke="#000000"
+              stroke-width="2"
+              position="0 0.7 0.1"
+              align="center"
+              width="2">
+      </a-text>
 
-    <!-- Tap anywhere to play -->
-    <script>
-      window.addEventListener("DOMContentLoaded", () => {
-        const rocket = document.querySelector("#rocket");
-        const prompt = document.querySelector("#tapPrompt");
+      <!-- Rocket model -->
+      <a-gltf-model id="rocket"
+                    src="#rocketModel"
+                    scale="0.3 0.3 0.3"
+                    position="0 0 0.1"
+                    rotation="0 0 0"
+                    animation-mixer="clip: rocket_launch; loop: once; timeScale: 0;">
+      </a-gltf-model>
 
-        // Make sure rocket is paused at start
-        rocket.setAttribute("animation-mixer", { clip: "rocket_launch", loop: "once", timeScale: 0 });
+      <!-- Lighting -->
+      <a-light type="directional" intensity="1" position="1 1 1"></a-light>
+      <a-light type="ambient" intensity="0.6"></a-light>
+    </a-entity>
+  </a-scene>
 
-        // Tap anywhere while marker is visible
-        window.addEventListener("touchstart", () => {
-          // Hide prompt
-          prompt.setAttribute("visible", false);
+  <!-- Script for tap interaction -->
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const rocket = document.querySelector("#rocket");
+      const prompt = document.querySelector("#tapPrompt");
+      const tapZone = document.querySelector("#tapZone");
 
-          // Play animation
-          rocket.setAttribute("animation-mixer", { clip: "rocket_launch", loop: "once", timeScale: 1 });
-        });
+      // Ensure rocket starts paused
+      rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
+
+      // Play animation when invisible button is tapped
+      tapZone.addEventListener("click", () => {
+        prompt.setAttribute("visible", false);
+        rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:1 });
+
+        // Optional: reset after animation duration (e.g., 2.5s)
+        setTimeout(() => {
+          rocket.setAttribute("animation-mixer", { clip:"rocket_launch", loop:"once", timeScale:0 });
+          prompt.setAttribute("visible", true);
+        }, 2500); // adjust to your animation length
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
 </html>

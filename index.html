@@ -58,8 +58,8 @@
                       src="#rocketModel"
                       scale="0.3 0.3 0.3"
                       position="0 0 0.1"
-                      rotation="0 0 0"
-                      animation-mixer="clip:none; loop:once; timeScale:1;">
+                      rotation="90 0 0"
+                      animation-mixer="clip:rocket_launch; loop:once; timeScale:0;">
         </a-gltf-model>
 
         <!-- Basic lighting -->
@@ -69,21 +69,30 @@
     </a-scene>
 
     <script>
-      window.addEventListener("DOMContentLoaded", () => {
-        const markerTarget = document.querySelector("#markerTarget");
-        const rocket = document.querySelector("#rocket");
-        const prompt = document.querySelector("#tapPrompt");
+    window.addEventListener("DOMContentLoaded", () => {
+    const markerTarget = document.querySelector("#markerTarget");
+    const rocket = document.querySelector("#rocket");
+    const prompt = document.querySelector("#tapPrompt");
 
-        // attach tap listener to MindAR target (works better on mobile)
-        markerTarget.addEventListener("click", () => {
-          prompt.setAttribute("visible", false);
-          rocket.setAttribute("animation-mixer", {
-            clip: "rocket_launch",   // make sure this matches the GLB clip name
-            loop: "once",
-            timeScale: 1
-          });
-        });
+    // make sure animation is paused initially
+    rocket.setAttribute("animation-mixer", {
+      clip: "rocket_launch",
+      loop: "once",
+      timeScale: 0
+    });
+
+    // play animation when the target is tapped
+    markerTarget.addEventListener("click", () => {
+      prompt.setAttribute("visible", false);
+
+      // play the animation by setting timeScale back to 1
+      rocket.setAttribute("animation-mixer", {
+        clip: "rocket_launch",
+        loop: "once",
+        timeScale: 1
       });
+    });
+  });
     </script>
   </body>
 </html>
